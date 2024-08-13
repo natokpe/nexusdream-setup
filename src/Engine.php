@@ -5,6 +5,8 @@ declare(strict_types = 1);
 
 namespace NatOkpe\Wp\Plugin\NexusdreamSetup;
 
+use NatOkpe\Wp\Theme\Nexusdream\Utils\Clock;
+
 use \WP_Post;
 use \WP_Role;
 use \WP_User_Query;
@@ -688,128 +690,107 @@ class Engine
             return $ed_roles;
         });
 
-        // add_action('make_payment', function (int $user_id, int $item_id, array $details = []) {
-        //     $payee = get_user_by('ID', $user_id);
-        //     $item  = get_post($item_id);
+        add_action('submit_application', function (array $details = []) {
+            $cnt = [
+                'jobs' => [],
 
-        //     $check = ($payee instanceOf WP_User) && ($item instanceOf WP_Post);
-        //     $check = $check && in_array($item->post_type, ['course']);
-        //     $check = $check && is_int($details['amount'] ?? null);
-        //     $check = $check && (($details['amount'] ?? -1) >= 0);
-        //     $check = $check && is_string($details['description'] ?? '');
-        //     $check = $check && is_string($details['txn_proof'] ?? '');
+                'edu'  => [
+                    'masters'  => 'Masters',
+                    'bachelor' => 'Bachelor degree',
+                    'ssce'     => 'Senior Secondary School certificate',
+                    'jsce'     => 'Junior Secondary School certificate',
+                    'primary'  => 'First School Leaving certificate',
+                ],
 
-        //     $check = $check && ! (isset($details['status']) && (! in_array($details['status'], ['failed', 'cancelled', 'success', 'pending', 'reversed'])));
+                'know' => [
+                    'word_of_mouth' => 'Word of mouth',
+                    'google'        => 'Google',
+                    'facebook'      => 'Facebook',
+                    'instagram'     => 'Instagram',
+                    'x'             => 'X',
+                    'tiktok'        => 'Tiktok',
+                    'other'         => 'Other',
+                ],
+            ];
 
-        //     // $check = $check &&  ! (isset($details['txn_ref']) && (! empty((new WP_Query([
-        //     //     'post_type'    => 'payment',
-        //     //     'nopaging'     => true,
-        //     //     'meta_query' => [
-        //     //         'relation' => 'AND',
-        //     //         [
-        //     //             'key'   => 'sender',
-        //     //             'value' => $payee->ID,
-        //     //             'compare' => '=',
-        //     //         ], [
-        //     //             'key'   => 'item',
-        //     //             'value' => $item->ID,
-        //     //             'compare' => '=',
-        //     //         ], [
-        //     //             'key'   => 'txn_ref',
-        //     //             'value' => $details['txn_ref'],
-        //     //             'compare' => '=',
-        //     //         ],
-        //     //     ],
-        //     // ]))->posts)));
+            foreach (((new WP_Query([
+                'post_type'           => 'job_position',
+                'post_status'         => 'publish',
+                'has_password'        => false,
+                'ignore_sticky_posts' => false,
+                'order'               => 'DESC',
+                'orderby'             => 'date',
+                'nopaging'            => true,
+                'paged'               => false,
+            ]))->posts) as $_) {
+                $cnt['jobs'][$_->ID] = $_->post_title;
+            }
 
-        //     // check if payment has been made
-        //     $check = $check && empty((new WP_Query([
-        //         'post_type'    => 'payment',
-        //         'nopaging'     => true,
-        //         'meta_query' => [
-        //             'relation' => 'AND',
-        //             [
-        //                 'key'   => 'sender',
-        //                 'value' => $payee->ID,
-        //                 'compare' => '=',
-        //             ], [
-        //                 'key'   => 'item',
-        //                 'value' => $item->ID,
-        //                 'compare' => '=',
-        //             ], [
-        //                 'key'   => 'status',
-        //                 'value' => ['success', 'pending'],
-        //                 'compare' => 'IN',
-        //             ],
-        //         ],
-        //     ]))->posts);
+            $check = array_key_exists($details['job'], $cnt['jobs']);
+            $check = $check && (! empty($details['name']) && (strlen($details['name']) <= 100));
+            $check = $check && (! empty($details['email']) && (strlen($details['email']) <= 80));
+            $check = $check && ((strlen($details['phone']) === 11) && ctype_digit($details['phone']));
+            $check = $check && (array_key_exists($details['edu'], $cnt['edu']));
+            $check = $check && (! empty($details['skills']) && (strlen($details['skills']) <= 500));
+            $check = $check && (! empty($details['about']) && (strlen($details['about']) <= 500));
+            $check = $check && (is_string($details['cv']) && ! empty((string) $details['cv']));
 
-        //     if (! $check) {
-        //         return;
-        //     }
+            if (isset($details['letter'])) {
+                $check = $check && (is_string($details['letter']) && ! empty((string) $details['letter']));
+            }
 
-        //     wp_insert_post([
-        //         'post_title'     => '',
-        //         'post_content'   => '',
-        //         'post_type'      => 'payment',
-        //         'post_status'    => 'publish',
-        //         'comment_status' => 'closed',
-        //         'ping_status'    => 'closed',
-        //         'meta_input'     => [
-        //             'sender'         => $payee->ID,
-        //             'item'           => $item->ID,
-        //             'amount'         => $details['amount'],
-        //             'status'         => $details['status'] ?? 'pending',
-        //             'description'    => $details['description'] ?? '',
-        //             'txn_ref'        => $details['txn_ref'] ?? '',
-        //             'txn_proof'      => $details['txn_proof'] ?? '',
-        //             'recipient_bank' => $details['recipient_bank'] ?? '',
-        //             'recipient_ac'   => $details['recipient_ac'] ?? '',
-        //             'recipient_name' => $details['recipient_name'] ?? '',
-        //         ],
-        //     ], true, true);
+            $check = $check && (array_key_exists($details['know'], $cnt['know']));
 
-        // }, 10, 3);
+            $check = $check && empty((new WP_Query([
+                'post_type'    => 'job_application',
+                'nopaging'     => true,
+                'meta_query' => [
+                    [
+                        'key'     => 'email',
+                        'value'   => $details['email'],
+                        'compare' => '=',
+                    ],
+                ],
+            ]))->posts);
 
-        // add_action('save_post_payment', function ($post_id, $post, $update) {
-        //     $student          = get_post_meta($post_id, 'sender', true);
-        //     $course           = get_post_meta($post_id, 'item', true);
-        //     $payment_status   = get_post_meta($post_id, 'status', true);
+            if (! $check) {
+                return;
+            }
 
-        //     $student_enrolled = ! empty((new WP_Query([
-        //         'post_type' => 'enrollment',
-        //         'nopaging'  => true,
-        //         'meta_query'      => [
-        //             'relation' => 'AND',
-        //             [
-        //                 'key'   => 'user_id',
-        //                 'value' => $student,
-        //                 'compare' => '=',
-        //             ], [
-        //                 'key'   => 'course_id',
-        //                 'value' => $course,
-        //                 'compare' => '=',
-        //             ],
-        //         ],
-        //     ]))->posts);
+            $ref = strtoupper(base_convert(((string) random_int(1, 9))
+            . ((string) Clock::now())
+            . ((string) random_int(0, 999))
+            . ((string) random_int(0, 999)), 10, 36));
 
-        //     if ($payment_status === 'success' && (! $student_enrolled)) {
-        //         wp_insert_post([
-        //             'post_title'     => '',
-        //             'post_content'   => '',
-        //             'post_type'      => 'enrollment',
-        //             'post_status'    => 'publish',
-        //             'comment_status' => 'closed',
-        //             'ping_status'    => 'closed',
-        //             'meta_input'     => [
-        //                 'user_id'   => $student,
-        //                 'course_id' => $course,
-        //             ],
-        //         ], false, true);
-        //     }
-        // }, 10, 3);
+            wp_insert_post([
+                'post_title'     => $cnt['jobs'][$details['job']] . ' - ' . $ref,
+                'post_content'   => '',
+                'post_type'      => 'job_application',
+                'post_status'    => 'publish',
+                'comment_status' => 'closed',
+                'ping_status'    => 'closed',
+                'meta_input'     => [
+                    'job'         => $details['job'],
+                    'name'        => $details['name'],
+                    'email'       => $details['email'],
+                    'phone'       => $details['phone'],
+                    'edu'         => $details['edu'],
+                    'skills'      => $details['skills'],
+                    'about'       => $details['about'],
+                    'cv'          => $details['cv'],
+                    'letter'      => $details['letter'] ?? '',
+                    'know'        => $details['know'],
+                    'ref'         => $ref,
+                ],
+            ], true, true);
 
+        }, 10, 1);
 
+        add_action('save_post_job_application', function ($post_id, $post, $update) {
+            // $student          = get_post_meta($post_id, 'sender', true);
+            // $course           = get_post_meta($post_id, 'item', true);
+            // $payment_status   = get_post_meta($post_id, 'status', true);
+        }, 10, 3);
     }
 }
 /*

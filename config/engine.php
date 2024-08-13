@@ -38,38 +38,19 @@ return [
             'svg' => 'image/svg+xml',
             'svgz' => 'image/svg+xml',
             'ico' => 'image/x-icon',
-            'cur' => 'image/x-icon',
-            'avif' => 'image/avif',
             'gif' => 'image/gif',
             'webp' => 'image/webp',
-            'tif' => 'image/tiff',
-            'tiff' => 'image/tiff',
-
-            // Audio
-            // 'aac' => 'audio/aac',
-            // 'wav' => 'audio/wav',
-            // 'mp3' => 'audio/mpeg',
-
-            // Video
-            // 'avi' => 'video/x-msvideo',
-            // 'webm' => 'video/webm',
-            // 'mp4' => 'video/mp4',
 
             // Docs
             'pdf' => 'application/pdf',
-            // 'csv' => 'text/csv',
-            // 'doc' => 'application/msword',
-            // 'txt' => 'text/plain',
-
-            // Archive
-            // 'zip' => 'application/zip',
         ]);
     },
 
     'query_vars' => [
-        'as', // application submission status
-        'jp', // job position
+        'jpos', // job position
+        'apr', // application reference
         'nnc', // nonce
-        'pg', // page|view|tab
+        'pvw', // page|view|tab
+        'sta', // status
     ],
 ];

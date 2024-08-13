@@ -1,90 +1,146 @@
 <?php
 declare(strict_types = 1);
 
-$class_cou  = [];
-
-foreach (get_posts([
-    'has_password' => false,
-    'post_type'    => 'course',
-    'post_status'  => 'publish',
-    'nopaging'     => true,
-    'order'        => 'ASC',
-    'order_by'     => 'title'
-]) as $_cp) {
-    $class_cou[$_cp->ID] = empty($_cp->post_title) ? 'Course ID: ' . $_cp->ID
-    : $_cp->post_title . ' (Course ID: ' . $_cp->ID .')';
-}
+// foreach (((new WP_Query([
+//     'post_type'           => 'job_position',
+//     'post_status'         => 'publish',
+//     'has_password'        => false,
+//     'ignore_sticky_posts' => false,
+//     'order'               => 'DESC',
+//     'orderby'             => 'date',
+//     'nopaging'            => true,
+//     'paged'               => false,
+// ]))->posts) as $_) {
+//     $cnt['jobs'][$_->ID] = $_->post_title;
+// }
 
 return [
-
-    'cls_pr' => [
-        'title'         => __('Course Settings', 'natokpe'),
-        'object_types'  => ['class'],
+    'app_det' => [
+        'title'         => __('Details', 'natokpe'),
+        'object_types'  => ['job_application'],
         'context'       => 'normal',
         'priority'      => 'high',
         'show_names'    => true,
-        'closed'        => true,
+        'closed'        => false,
 
         'box-fields' => [
-            'course_id' => [
-                'name'       => __('Course', 'natokpe'),
-                'desc'       => __('Select course this class is for.', 'natokpe'),
+            'ref' => [
+                'name'       => __('Application Reference', 'natokpe'),
+                'desc'       => __('', 'natokpe'),
+                'type'       => 'text',
+                'attributes'       => [
+                    'readonly'    => 'readonly',
+                ],
+            ],
+
+            'job' => [
+                'name'       => __('Position', 'natokpe'),
+                'desc'       => __('', 'natokpe'),
+                'type'       => 'text',
+                'attributes'       => [
+                    'readonly'    => 'readonly',
+                ],
+            ],
+
+            'name' => [
+                'name'       => __('Full Name', 'natokpe'),
+                'desc'       => __('', 'natokpe'),
+                'type'       => 'text',
+                'attributes'       => [
+                    'readonly'    => 'readonly',
+                ],
+            ],
+
+            'email' => [
+                'name'       => __('Email Address', 'natokpe'),
+                'desc'       => __('', 'natokpe'),
+                'type'       => 'text',
+                'attributes'       => [
+                    'readonly'    => 'readonly',
+                ],
+            ],
+
+            'phone' => [
+                'name'       => __('Phone Number', 'natokpe'),
+                'desc'       => __('', 'natokpe'),
+                'type'       => 'text',
+                'attributes'       => [
+                    'readonly'    => 'readonly',
+                ],
+            ],
+
+            'edu' => [
+                'name'       => __('Highest Educational Qualification', 'natokpe'),
+                'desc'       => __('', 'natokpe'),
                 'type'       => 'select',
-                'show_option_none' => true,
-                'options'          => $class_cou,
                 'attributes'       => [
-                    'required'    => 'required',
+                    'readonly'    => 'readonly',
+                    'disabled' => 'disabled',
+                ],
+                'options' => [
+                    'masters'  => 'Masters',
+                    'bachelor' => 'Bachelor degree',
+                    'ssce'     => 'Senior Secondary School certificate',
+                    'jsce'     => 'Junior Secondary School certificate',
+                    'primary'  => 'First School Leaving certificate',
                 ],
             ],
+
+            'skills' => [
+                'name'       => __('Describe a skill or quality that you believe is essential for this role, and how you have developed or utilized this skill in your previous experiences.', 'natokpe'),
+                'desc'       => __('', 'natokpe'),
+                'type'       => 'textarea',
+                'attributes'       => [
+                    'readonly'    => 'readonly',
+                ],
+            ],
+
+            'about' => [
+                'name'       => __('Tell us more about yourself. Focus on your past experiences that have shaped your professional journey. Also highlight any key roles that have been instrumental in your career development.', 'natokpe'),
+                'desc'       => __('', 'natokpe'),
+                'type'       => 'textarea',
+                'attributes'       => [
+                    'readonly'    => 'readonly',
+                ],
+            ],
+
+            'cv' => [
+                'name'       => __('CV', 'natokpe'),
+                'desc'       => __('', 'natokpe'),
+                'type'       => 'text',
+                'attributes'       => [
+                    'readonly'    => 'readonly',
+                ],
+            ],
+
+            'letter' => [
+                'name'       => __('Cover Letter', 'natokpe'),
+                'desc'       => __('', 'natokpe'),
+                'type'       => 'text',
+                'attributes'       => [
+                    'readonly'    => 'readonly',
+                ],
+            ],
+
+            'know' => [
+                'name'       => __('How did you hear about us?', 'natokpe'),
+                'desc'       => __('', 'natokpe'),
+                'type'       => 'select',
+                'attributes'       => [
+                    'readonly' => 'readonly',
+                    'disabled' => 'disabled',
+                ],
+                'options' => [
+                    'word_of_mouth' => 'Word of mouth',
+                    'google'        => 'Google',
+                    'facebook'      => 'Facebook',
+                    'instagram'     => 'Instagram',
+                    'x'             => 'X',
+                    'tiktok'        => 'Tiktok',
+                    'other'         => 'Other',
+                ],
+            ],
+
         ],
     ],
-
-    'cls_set' => [
-        'title'         => __('Schedule', 'natokpe'),
-        'object_types'  => ['class'],
-        'context'       => 'normal',
-        'priority'      => 'high',
-        'show_names'    => true,
-        'closed'        => true,
-
-        'box-fields' => [
-            'start_time' => [
-                'name'       => __('Start Date/Time', 'natokpe'),
-                'desc'       => __('Set a time when class session will begin.', 'natokpe'),
-                'type'       => 'text_datetime_timestamp',
-                'attributes'       => [
-                    'required'    => 'required',
-                ],
-            ],
-
-            'duration' => [
-                'name'       => __('Duration (in minutes)', 'natokpe'),
-                'desc'       => __('For how long will the class session be on. Minimum is 1 minute.', 'natokpe'),
-                'type'       => 'text',
-                'attributes'  => [
-                    'required'    => 'required',
-                    'min' => '1',
-                    'type' => 'number',
-                ],
-            ],
-
-            'virtual_class_url' => [
-                'name'       => __('Class URL', 'natokpe'),
-                'desc'       => __('A URL to the online class.', 'natokpe'),
-                'type'       => 'text_url',
-                'attributes'       => [
-                    'required'    => 'required',
-                ],
-            ],
-
-            'virtual_class_pass' => [
-                'name'       => __('Class Pass', 'natokpe'),
-                'desc'       => __('Access code for joining class if required.', 'natokpe'),
-                'type'       => 'text',
-                'attributes'  => [
-                ],
-            ],
-        ],
-    ],
-
 ];
