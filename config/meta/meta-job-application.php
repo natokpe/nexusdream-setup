@@ -1,6 +1,7 @@
 <?php
 declare(strict_types = 1);
 
+// var_dump(is_admin());exit;
 // foreach (((new WP_Query([
 //     'post_type'           => 'job_position',
 //     'post_status'         => 'publish',
